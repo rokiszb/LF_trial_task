@@ -1,0 +1,15 @@
+services:
+  ###> doctrine/doctrine-bundle ###
+  database:
+    image: 'mysql:8.4'
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony_user
+      MYSQL_PASSWORD: pass
+    ports:
+      - '3306'
+    volumes:
+      - database_data:/var/lib/mysql
+volumes:
+  database_data:
