@@ -104,10 +104,6 @@ case "$1" in
         echo -e "${GREEN}Clearing application cache...${NC}"
         run_command "docker compose exec php bin/console cache:clear"
         ;;
-    check-php-user)
-        echo -e "${GREEN}Checking php user${NC}"
-        check_php_user
-        ;;
     bash)
         echo -e "${GREEN}Opening bash shell in PHP container...${NC}"
         run_command "docker compose exec php bash"
@@ -138,7 +134,6 @@ case "$1" in
         echo
         echo "Commands:"
         echo "  start        - Start Docker containers"
-        echo "  check-php-user - Check which user php running as"
         echo "  stop         - Stop Docker containers"
         echo "  restart      - Restart Docker containers"
         echo "  install      - Install Composer dependencies"

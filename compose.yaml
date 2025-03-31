@@ -1,6 +1,5 @@
 services:
   php:
-#    user: "1000:www-data"
     build:
       context: .
       dockerfile: docker/php/Dockerfile
@@ -51,11 +50,13 @@ services:
   mailer:
     image: axllent/mailpit
     ports:
-      - "1025"
-      - "8025"
+      - "1025:1025"
+      - "8025:8025"
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - symfony_network
 
 networks:
   symfony_network:
