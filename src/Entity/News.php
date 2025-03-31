@@ -5,10 +5,15 @@ namespace App\Entity;
 use App\Repository\NewsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: NewsRepository::class)]
+#[Vich\Uploadable]
 class News
 {
     #[ORM\Id]
@@ -19,8 +24,11 @@ class News
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $shortDescription = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $content = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $insertDate = null;
@@ -28,15 +36,23 @@ class News
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $pictureFilename = null;
 
-    /**
-     * @var Collection<int, Category>
-     */
+    #[Vich\UploadableField(mapping: 'news_images', fileNameProperty: 'pictureFilename')]
+    private ?File $pictureFile = null;
+
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'news')]
     private Collection $categories;
+
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'news', orphanRemoval: true)]
+    private Collection $comments;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->insertDate = new \DateTime();
     }
 
     public function getId(): ?int
@@ -61,9 +77,21 @@ class News
         return $this->shortDescription;
     }
 
-    public function setShortDescription(?string $shortDescription): static
+    public function setShortDescription(string $shortDescription): static
     {
         $this->shortDescription = $shortDescription;
+
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): static
+    {
+        $this->content = $content;
 
         return $this;
     }
@@ -92,6 +120,22 @@ class News
         return $this;
     }
 
+    public function getPictureFile(): ?File
+    {
+        return $this->pictureFile;
+    }
+
+    public function setPictureFile(?File $pictureFile = null): void
+    {
+        $this->pictureFile = $pictureFile;
+
+        if (null !== $pictureFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTime();
+        }
+    }
+
     /**
      * @return Collection<int, Category>
      */
@@ -112,6 +156,59 @@ class News
     public function removeCategory(Category $category): static
     {
         $this->categories->removeElement($category);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getCommentsOrdered(): Collection
+    {
+        $criteria = Criteria::create()
+            ->orderBy(['createdAt' => Order::Descending]);
+
+        return $this->comments->matching($criteria);
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setNews($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getNews() === $this) {
+                $comment->setNews(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

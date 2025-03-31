@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ news.title }}{% endblock %}
+
+{% block body %}
+    <div class="container-sm p-5 my-5 w-75">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+            <h1>News Article Details</h1>
+            <div>
+                <a href="{{ path('app_admin_news_edit', {'id': news.id}) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{{ path('app_admin_news') }}" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h3 class="card-title m-0">{{ news.title }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        {% if news.pictureFilename %}
+                            <img src="{{ vich_uploader_asset(news, 'pictureFile') | imagine_filter('large') }}"
+                                 class="img-fluid rounded" alt="{{ news.title }}">
+                        {% else %}
+                            <div class="bg-light rounded d-flex justify-content-center align-items-center" style="height: 300px;">
+                                <span class="text-muted">No image available</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-3">
+                            <h5>Categories:</h5>
+                            <div>
+                                {% for category in news.categories %}
+                                    <span class="badge bg-info me-1">{{ category.title }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No Categories</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <h5>Article Info:</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Created:</strong> {{ news.insertDate|date('Y-m-d H:i') }}</li>
+                                <li>
+                                    <strong>Last Updated:</strong>
+                                    {% if news.updatedAt %}
+                                        {{ news.updatedAt|date('Y-m-d H:i') }}
+                                    {% else %}
+                                        Never updated
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <strong>Comments:</strong> {{ news.comments|length }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="mb-4">
+                            <h5>Short Description:</h5>
+                            <div class="p-3 bg-light rounded">
+                                {{ news.shortDescription }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5>Content:</h5>
+                            <div class="content-box border rounded p-3">
+                                {{ news.content|raw }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                {% if news.comments|length > 0 %}
+                    <div class="mt-4">
+                        <h5>Comments ({{ news.comments|length }}):</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Latest comments:</span>
+                            <a href="{{ path('app_admin_news_comments', {'id': news.id}) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-comments"></i> Manage All Comments
+                            </a>
+                        </div>
+                        <div class="list-group">
+                            {% for comment in news.comments|slice(0, 3) %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>{{ comment.author|default('Anonymous') }}</strong>
+                                        <small>{{ comment.createdAt|date('Y-m-d H:i') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ comment.content }}</p>
+                                </div>
+                            {% endfor %}
+
+                            {% if news.comments|length > 3 %}
+                                <div class="list-group-item text-center">
+                                    <a href="{{ path('app_admin_news_comments', {'id': news.id}) }}">View all {{ news.comments|length }} comments</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

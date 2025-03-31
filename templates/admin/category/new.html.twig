@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Category{% endblock %}
+
+{% block body %}
+    <div class="container-sm p-5 my-5 w-75">
+        <h1 class="mt-4 mb-4">Create New Category</h1>
+
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title m-0">Category Details</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+
+                <div class="mb-3">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+
+                {{ form_rest(form) }}
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('admin_category_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Create
+                    </button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 for better UX on multiple select
+            if (document.querySelector('.select2')) {
+                $('.select2').select2({
+                    placeholder: 'Select news articles',
+                    width: '100%'
+                });
+            }
+        });
+    </script>
+{% endblock %}

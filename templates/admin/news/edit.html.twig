@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit News Article{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css">#}
+{% endblock %}
+
+{% block body %}
+    <div class="container-sm p-5 my-5 w-75">
+        <h1 class="mt-4 mb-4">Edit News Article</h1>
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title m-0">Editing: {{ news.title }}</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'enctype': 'multipart/form-data'}}) }}
+
+                <div class="mb-3">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.shortDescription) }}
+                    {{ form_widget(form.shortDescription, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                    {{ form_errors(form.shortDescription) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.content) }}
+                    {{ form_widget(form.content, {'attr': {'class': 'form-control summernote'}}) }}
+                    {{ form_errors(form.content) }}
+                </div>
+                <div class="col-md-4 mb-4">
+                    {{ form_label(form.pictureFile) }}
+                    {{ form_widget(form.pictureFile, {'attr': {'style': 'margin-bottom: 1rem;'}}) }}
+                    {{ form_errors(form.pictureFile) }}
+
+
+
+                    {% if news.pictureFilename %}
+                        <div class=" mb-6">
+                            <p>Current image:</p>
+                            <img src="{{ vich_uploader_asset(news, 'pictureFile') | imagine_filter('large') }}"
+                                 class="img-thumbnail" alt="{{ news.title }}" >
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(form.categories) }}
+                    <div class="categories-container row g-3">
+                        {% for category in form.categories %}
+                            <div class="col-md-3 col-sm-4 col-6">
+                                <div class="form-check">
+                                    {{ form_widget(category) }}
+                                    {{ form_label(category) }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {{ form_errors(form.categories) }}
+                    </div>
+                </div>
+
+
+
+                {{ form_rest(form) }}
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('app_admin_news') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update
+                    </button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comments for {{ news.title }}{% endblock %}
+
+{% block body %}
+    <div class="container-sm p-5 my-5 w-75">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+            <h1>Comments for News Article</h1>
+            <div>
+                <a href="{{ path('app_admin_news_edit', {'id': news.id}) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit Article
+                </a>
+                <a href="{{ path('app_admin_news_show', {'id': news.id}) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Article
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h3 class="card-title m-0">{{ news.title }}</h3>
+            </div>
+            <div class="card-body">
+                {% from 'macro/_alert.html.twig' import alert %}
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        {{ alert(label, message) }}
+                    {% endfor %}
+                {% endfor %}
+
+                <h5 class="mb-3">All Comments ({{ comments|length }})</h5>
+
+                {% if comments|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Author</th>
+                                <th>Content</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for comment in comments %}
+                                <tr>
+                                    <td>{{ comment.id }}</td>
+                                    <td>{{ comment.author|default('Anonymous') }}</td>
+                                    <td>{{ comment.content }}</td>
+                                    <td>{{ comment.createdAt|date('Y-m-d H:i') }}</td>
+                                    <td>
+                                        <form method="post" action="{{ path('app_admin_comment_delete', {'id': comment.id}) }}" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No comments found for this article.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

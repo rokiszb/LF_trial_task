@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="my-4">Welcome to our News Portal</h1>
+
+        <div class="row">
+            {% for category in categories %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h3>{{ category.title }}</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if latestNewsByCategory[category.id] is defined and latestNewsByCategory[category.id]|length > 0 %}
+                                <ul class="list-group">
+                                    {% for news in latestNewsByCategory[category.id] %}
+                                        <li class="list-group-item">
+                                            <h3>{{ news.title }}</h3>
+                                        {% if news.pictureFilename %}
+                                            <img src="{{ vich_uploader_asset(news, 'pictureFile') | imagine_filter('large') }}"
+                                                 class="img-fluid rounded" alt="{{ news.title }}">
+                                            a
+                                        {% endif %}
+                                            <p>{{ news.content|length > 100 ? (news.content|slice(0, 100) ~ '...') | raw  : news.content }}</p>
+                                            <small class="text-muted">Published: {{ news.insertDate|date('Y-m-d') }}</small>
+                                            <div class="mt-2">
+                                                <a href="{{ path('news_view', {'id': news.id}) }}" class="btn btn-sm btn-outline-primary">Read more</a>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No news available in this category.</p>
+                            {% endif %}
+
+                            <div class="mt-3">
+                                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn btn-primary">View all in {{ category.title }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">No categories found.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

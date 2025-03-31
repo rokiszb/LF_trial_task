@@ -11,13 +11,23 @@
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+        "league/html-to-markdown": "^5.1",
+        "liip/imagine-bundle": "^2.13",
+        "symfony/asset": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
+        "symfony/form": "7.2.*",
         "symfony/framework-bundle": "7.2.*",
+        "symfony/mailer": "7.2.*",
         "symfony/runtime": "7.2.*",
         "symfony/security-bundle": "7.2.*",
-        "symfony/yaml": "7.2.*"
+        "symfony/twig-bundle": "7.2.*",
+        "symfony/validator": "7.2.*",
+        "symfony/yaml": "7.2.*",
+        "twig/extra-bundle": "^3.20",
+        "twig/markdown-extra": "^3.20",
+        "vich/uploader-bundle": "^2.6"
     },
     "config": {
         "allow-plugins": {
@@ -70,6 +80,9 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.1",
+        "fakerphp/faker": "^1.24",
+        "smknstd/fakerphp-picsum-images": "^1.0",
         "symfony/maker-bundle": "^1.62"
     }
 }

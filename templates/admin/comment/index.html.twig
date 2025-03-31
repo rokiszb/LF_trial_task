@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comment Management{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Comment Management</h1>
+        {% from 'macro/_alert.html.twig' import alert %}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                {{ alert(label, message) }}
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Comments List</h6>
+            </div>
+            <div class="card-body">
+                {% if comments is defined and comments|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="commentsTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Author</th>
+                                <th>Content</th>
+                                <th>News Title</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for comment in comments %}
+                                <tr>
+                                    <td>{{ comment.id }}</td>
+                                    <td>{{ comment.author|default('Anonymous') }}</td>
+                                    <td>{{ comment.content|slice(0, 100) ~ (comment.content|length > 100 ? '...' : '') }}</td>
+                                    <td>
+                                        {% if comment.news %}
+                                            <a href="{{ path('news_view', {'id': comment.news.id}) }}">{{ comment.news.title }}</a>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ comment.createdAt|date('Y-m-d H:i') }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <form method="post" action="{{ path('app_admin_comment_delete', {'id': comment.id}) }}" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No comments found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('#commentsTable').DataTable({
+                "order": [[4, "desc"]] // Sort by created date (newest first)
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New News Article{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container-sm p-5 my-5 w-75">
+        <h1 class="mt-4 mb-4">Create New News Article</h1>
+
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title m-0">Article Details</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'enctype': 'multipart/form-data'}}) }}
+
+                <div class="mb-3">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.shortDescription) }}
+                    {{ form_widget(form.shortDescription, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                    {{ form_errors(form.shortDescription) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.content) }}
+                    {{ form_widget(form.content, {'attr': {'class': 'form-control summernote'}}) }}
+                    {{ form_errors(form.content) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.pictureFile) }}
+                    {{ form_widget(form.pictureFile) }}
+                    {{ form_errors(form.pictureFile) }}
+                    <small class="form-text text-muted">Upload an image for this news article</small>
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(form.categories) }}
+                    <div class="categories-container">
+                        {{ form_widget(form.categories) }}
+                        {{ form_errors(form.categories) }}
+                    </div>
+                </div>
+
+                {{ form_rest(form) }}
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('app_admin_news') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Create
+                    </button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.summernote').summernote({
+                placeholder: 'Write your article content here...',
+                tabsize: 2,
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+
+            // Style the checkboxes for categories
+            document.querySelectorAll('.categories-container .form-check').forEach(function(el) {
+                el.classList.add('mb-2');
+            });
+        });
+    </script>
+{% endblock %}

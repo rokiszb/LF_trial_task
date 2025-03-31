@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ news.title }}{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        {% from 'macro/_alert.html.twig' import alert %}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                {{ alert(label, message) }}
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <article>
+                    <header class="mb-4">
+                        <h1 class="fw-bolder mb-1">{{ news.title }}</h1>
+                        <div class="text-muted fst-italic mb-2">
+                            Posted on {{ news.insertDate|date('F d, Y') }}
+                        </div>
+                        {% if news.categories %}
+                            <div class="mb-3">
+                                {% for category in news.categories %}
+                                    <span class="badge bg-secondary text-decoration-none link-light">{{ category.title }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </header>
+
+                    {% if news.pictureFilename %}
+                        <img src="{{ vich_uploader_asset(news, 'pictureFile') | imagine_filter('large') }}"
+                             class="img-fluid rounded" alt="{{ news.title }}">
+                    {% else %}
+                        <div class="bg-light rounded d-flex justify-content-center align-items-center" style="height: 300px;">
+                            <span class="text-muted">No image available</span>
+                        </div>
+                    {% endif %}
+
+                    <section class="mb-5">
+                        <div class="fs-5">{{ news.content|raw }}</div>
+                    </section>
+                </article>
+
+                <section class="mb-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="mb-4">Leave a Comment</h4>
+
+                            {{ form_start(comment_form, {'attr': {'class': 'mb-4'}}) }}
+                            <div class="mb-3">
+                                {{ form_label(comment_form.author, 'Author') }}
+                                {{ form_widget(comment_form.author, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(comment_form.author) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(comment_form.content, 'Comment') }}
+                                {{ form_widget(comment_form.content, {'attr': {'class': 'form-control', 'rows': '5'}}) }}
+                                {{ form_errors(comment_form.content) }}
+                            </div>
+
+                            {{ form_rest(comment_form) }}
+
+                            <button class="btn btn-primary" type="submit">Submit Comment</button>
+                            {{ form_end(comment_form) }}
+
+                            <h4 class="mb-4 mt-5">Comments</h4>
+                            {% if news.comments|length > 0 %}
+                                {% for comment in news.CommentsOrdered %}
+                                    <div class="d-flex mb-4">
+                                        <div class="flex-shrink-0">
+                                            <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ comment.author|url_encode }}&background=random" alt="{{ comment.author }}" width="50" height="50">
+                                        </div>
+                                        <div class="ms-3">
+                                            <div class="fw-bold">{{ comment.author }}</div>
+                                            <div class="text-muted small mb-2">{{ comment.createdAt|date('F d, Y - H:i') }}</div>
+                                            <p>{{ comment.content }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center text-muted py-4">
+                                    <p>No comments yet. Be the first to comment!</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+{% endblock %}
