@@ -2,10 +2,6 @@
 
 {% block title %}Edit News Article{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css">#}
-{% endblock %}
 
 {% block body %}
     <div class="container-sm p-5 my-5 w-75">
@@ -14,7 +10,15 @@
             <div class="card-header">
                 <h5 class="card-title m-0">Editing: {{ news.title }}</h5>
             </div>
+
             <div class="card-body">
+                {% from 'macro/_alert.html.twig' import alert %}
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        {{ alert(label, message) }}
+                    {% endfor %}
+                {% endfor %}
+
                 {{ form_start(form, {'attr': {'class': 'needs-validation', 'enctype': 'multipart/form-data'}}) }}
 
                 <div class="mb-3">
@@ -65,10 +69,7 @@
                     </div>
                 </div>
 
-
-
                 {{ form_rest(form) }}
-
                 <div class="d-flex justify-content-between">
                     <a href="{{ path('app_admin_news') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to List
@@ -81,9 +82,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-
 {% endblock %}

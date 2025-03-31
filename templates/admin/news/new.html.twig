@@ -2,16 +2,24 @@
 
 {% block title %}Create New News Article{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css">
-{% endblock %}
-
 {% block body %}
     <div class="container-sm p-5 my-5 w-75">
         <h1 class="mt-4 mb-4">Create New News Article</h1>
 
+        {% from 'macro/_alert.html.twig' import alert %}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                {{ alert(label, message) }}
+            {% endfor %}
+        {% endfor %}
         <div class="card shadow mb-4">
+
+            {% from 'macro/_alert.html.twig' import alert %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    {{ alert(label, message) }}
+                {% endfor %}
+            {% endfor %}
             <div class="card-header">
                 <h5 class="card-title m-0">Article Details</h5>
             </div>
@@ -32,7 +40,7 @@
 
                 <div class="mb-3">
                     {{ form_label(form.content) }}
-                    {{ form_widget(form.content, {'attr': {'class': 'form-control summernote'}}) }}
+                    {{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.content) }}
                 </div>
 
@@ -43,10 +51,18 @@
                     <small class="form-text text-muted">Upload an image for this news article</small>
                 </div>
 
+
                 <div class="mb-4">
                     {{ form_label(form.categories) }}
-                    <div class="categories-container">
-                        {{ form_widget(form.categories) }}
+                    <div class="categories-container row g-3">
+                        {% for category in form.categories %}
+                            <div class="col-md-3 col-sm-4 col-6">
+                                <div class="form-check">
+                                    {{ form_widget(category) }}
+                                    {{ form_label(category) }}
+                                </div>
+                            </div>
+                        {% endfor %}
                         {{ form_errors(form.categories) }}
                     </div>
                 </div>
@@ -65,32 +81,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('.summernote').summernote({
-                placeholder: 'Write your article content here...',
-                tabsize: 2,
-                height: 300,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ]
-            });
-
-            // Style the checkboxes for categories
-            document.querySelectorAll('.categories-container .form-check').forEach(function(el) {
-                el.classList.add('mb-2');
-            });
-        });
-    </script>
 {% endblock %}

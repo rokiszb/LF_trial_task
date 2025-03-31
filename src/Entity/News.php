@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: NewsRepository::class)]
@@ -37,6 +38,15 @@ class News
     private ?string $pictureFilename = null;
 
     #[Vich\UploadableField(mapping: 'news_images', fileNameProperty: 'pictureFilename')]
+    #[Assert\File(
+        maxSize: '8M',
+        mimeTypes: [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+        ],
+        mimeTypesMessage: 'Please upload a valid image (JPEG, PNG, GIF).'
+    )]
     private ?File $pictureFile = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'news')]

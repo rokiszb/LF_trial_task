@@ -68,6 +68,16 @@ final class AdminNewsController extends AbstractController
             return $this->redirectToRoute('app_admin_news', [], Response::HTTP_SEE_OTHER);
         }
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'There were errors in your submission. Please check the form below.');
+
+            foreach ($form->getErrors(true) as $error) {
+                $fieldName = $error->getOrigin()->getName();
+                $errorMessage = $error->getMessage();
+                $this->addFlash('danger', "$fieldName: $errorMessage");
+            }
+        }
+
         return $this->render('admin/news/edit.html.twig', [
             'news' => $news,
             'form' => $form,
