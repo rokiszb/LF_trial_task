@@ -21,7 +21,6 @@ run_command() {
     fi
 }
 
-# Function to check if database is ready
 wait_for_db() {
     echo -e "${BLUE}Waiting for database to be ready...${NC}"
 
@@ -32,6 +31,8 @@ wait_for_db() {
         # Use MYSQL_PWD environment variable to avoid exposing password on command line
         if docker compose exec -e MYSQL_PWD=symfony database mysqladmin ping -h"localhost" -u"symfony" --silent; then
             echo -e "${GREEN}✓ Database is ready!${NC}"
+            # Add an extra sleep to ensure MySQL is fully initialized
+            sleep 2
             return 0
         fi
 
@@ -40,7 +41,7 @@ wait_for_db() {
         sleep 2
     done
 
-    echo -e "${RED}✗ Database did not become ready in time!${NC}"
+    echo -e "${RED}✗ Database failed to become ready after $max_retries attempts!${NC}"
     return 1
 }
 
@@ -51,25 +52,19 @@ check_php_user() {
 
 # Function to setup uploads directory with proper permissions
 setup_uploads_directories() {
-    echo -e "${BLUE}Fixing uploads directory for fixtures (without changing ownership)...${NC}"
+    echo -e "${BLUE}Setting up uploads directories...${NC}"
 
-    # 1. Ensure the directory exists
-    run_command "docker compose exec php mkdir -p public/uploads/news"
+    run_command "docker compose exec --user root php bash -c 'mkdir -p /var/www/html/public/uploads/news'"
+    run_command "docker compose exec --user root php bash -c 'mkdir -p /var/www/html/public/media/cache'"
 
-    # 2. Set very permissive permissions to allow any user to write
-    run_command "docker compose exec php chmod -R 777 public/uploads"
+    echo -e "${BLUE}Getting PHP process user info...${NC}"
+    php_user_info=$(docker compose exec php bash -c 'id')
+    echo -e "PHP runs as: $php_user_info"
 
-    # 3. Check the PHP process user (for diagnostic purposes)
-    run_command "docker compose exec php bash -c 'echo \"PHP CLI is running as: \$(id)\"'"
-
-    # 4. Try to create a test file to verify write permissions
-    run_command "docker compose exec php bash -c 'echo \"test\" > public/uploads/news/test_write.txt && echo \"Write test successful\" || echo \"Write test failed\"'"
-
-    # 5. Show the directory structure after changes
-    run_command "docker compose exec php ls -la public/uploads/news"
-
-    echo -e "${GREEN}✓ Uploads directory for fixtures has been fixed!${NC}"
-
+    run_command "docker compose exec --user root php bash -c 'chown -R www-data:www-data /var/www/html/public/uploads /var/www/html/public/media'"
+    run_command "docker compose exec --user root php bash -c 'chmod -R 2775 /var/www/html/public/uploads /var/www/html/public/media'"
+    run_command "docker compose exec --user root php bash -c 'chmod -R o+w /var/www/html/public/uploads /var/www/html/public/media'"
+    echo -e "${GREEN}✓ Upload directories prepared with correct permissions!${NC}"
 }
 
 case "$1" in
@@ -93,13 +88,14 @@ case "$1" in
         ;;
     setup)
         echo -e "${GREEN}Setting up the application...${NC}"
+        run_command "docker compose build"
         run_command "docker compose up -d"
         run_command "docker compose exec php composer install"
-#        setup_uploads_directories
+        setup_uploads_directories
         wait_for_db
         run_command "docker compose exec php bin/console doctrine:migrations:migrate --no-interaction"
         run_command "docker compose exec php bin/console doctrine:fixtures:load --no-interaction"
-        run_command "docker compose exec php bash -c 'chown -R www-data:www-data /var/www/html/public/uploads'"
+
         echo -e "${GREEN}✓ Setup complete!${NC}"
         echo -e "${GREEN}✓ Access the application at: http://localhost:8080${NC}"
         echo -e "${GREEN}✓ Admin credentials: admin@example.com / pass${NC}"

@@ -2,93 +2,86 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Category;
 use App\Entity\News;
+use App\Entity\Category;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Faker\Factory;
-use Liip\ImagineBundle\Service\FilterService;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 class NewsFixtures extends Fixture implements DependentFixtureInterface
 {
-    public function __construct(
-        private ParameterBagInterface $parameterBag,
-        private Filesystem $filesystem,
-//        private FilterService $filterService,
-//        private CacheManager $cacheManager,
+    private $projectDir;
 
-    ){}
+    public function __construct(string $projectDir)
+    {
+        $this->projectDir = $projectDir;
+    }
 
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create();
+        $uploadsDir = $this->projectDir . '/public/uploads/news';
+        if (!is_dir($uploadsDir)) {
+            mkdir($uploadsDir, 0777, true);
+        }
 
-        $stockImagesDir = $this->parameterBag->get('kernel.project_dir') . '/public/media/stock';
-        $uploadDir = $this->parameterBag->get('kernel.project_dir') . '/public/uploads/news';
-        $finder = new Finder();
-        $finder->files()->in($stockImagesDir)->name(['*.jpg', '*.jpeg', '*.png']);
+        $stockImages = $this->getStockImages();
+        if (empty($stockImages)) {
+            throw new \RuntimeException('No stock images found in /public/media/stock directory');
+        }
 
-        $stockImages = iterator_to_array($finder);
-        $stockImagesCount = count($stockImages);
-
-
-        // Create news articles
         for ($i = 0; $i < 50; $i++) {
             $news = new News();
-            $news->setTitle($faker->sentence(rand(2, 5)));
-            $content = '';
-
-            for ($p = 0; $p < rand(3, 6); $p++) {
-                $sentences = $faker->sentences(rand(3, 8));
-                $content .= "<p>" . implode(' ', $sentences) . "</p>";
-            }
-
-            $content .= "<h4>" . $faker->sentence() . "</h4>";
-
-            for ($p = 0; $p < rand(2, 4); $p++) {
-                $sentences = $faker->sentences(rand(3, 6));
-                $content .= "<p>" . implode(' ', $sentences) . "</p>";
-            }
-
-            $content .= "<blockquote>" . implode(' ', $faker->sentences(rand(1, 3))) . "</blockquote>";
-
-            for ($p = 0; $p < rand(1, 3); $p++) {
-                $sentences = $faker->sentences(rand(2, 5));
-                $content .= "<p>" . implode(' ', $sentences) . "</p>";
-            }
-
-            $news->setContent($content);
-
-            $shortSentences = $faker->sentences(rand(2, 3));
-            $news->setShortDescription(implode(' ', $shortSentences));
-
-            $news->setInsertDate(new \DateTimeImmutable($faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d H:i:s')));
+            $news->setTitle($faker->sentence(6, true));
+            $news->setShortDescription($faker->paragraph(2));
+            $news->setContent($faker->paragraphs(5, true));
 
             $categoryCount = rand(1, 3);
             for ($j = 0; $j < $categoryCount; $j++) {
-                $randomCategoryId = rand(0, 9);
-                $category = $this->getReference('category_' . $randomCategoryId, Category::class);
-                $news->addCategory($category);
+                $categoryRef = 'category_' . rand(0, 9);
+                $news->addCategory($this->getReference($categoryRef, Category::class));
             }
 
-            $randomIndex = rand(0, $stockImagesCount - 1);
-            $stockImage = array_values($stockImages)[$randomIndex];
-
-            $originalExtension = $stockImage->getExtension();
-            $pictureFileName = 'news_' . $i . '_' . uniqid() . '.' . $originalExtension;
-            $destinationPath = $uploadDir . '/' . $pictureFileName;
-            copy($stockImage->getRealPath(), $destinationPath);
-
-            $news->setPictureFileName($pictureFileName);
+            $randomStockImage = $stockImages[array_rand($stockImages)];
+            $this->addStockImage($news, $randomStockImage, $uploadsDir);
             $manager->persist($news);
             $this->addReference('news_' . $i, $news);
         }
 
         $manager->flush();
+    }
+
+    private function getStockImages(): array
+    {
+        $stockDir = $this->projectDir . '/public/media/stock';
+        if (!is_dir($stockDir)) {
+            return [];
+        }
+
+        $finder = new Finder();
+        $finder->files()->in($stockDir)->name(['*.jpg', '*.jpeg', '*.png', '*.gif']);
+
+        $images = [];
+        foreach ($finder as $file) {
+            $images[] = $file->getRealPath();
+        }
+
+        return $images;
+    }
+
+    private function addStockImage(News $news, string $stockImagePath, string $uploadsDir): void
+    {
+        $originalFilename = basename($stockImagePath);
+        $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
+        $newFilename = 'news_' . $news->getId() . '_' . uniqid() . '.' . $extension;
+        $newFilePath = $uploadsDir . '/' . $newFilename;
+        copy($stockImagePath, $newFilePath);
+        chmod($newFilePath, 0666);
+        $news->setPictureFilename($newFilename);
     }
 
     public function getDependencies(): array

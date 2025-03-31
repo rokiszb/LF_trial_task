@@ -1,6 +1,6 @@
 services:
   php:
-    user: "${UID:-1000}:${GID:-1000}"
+    user: "1000:www-data"
     build:
       context: .
       dockerfile: docker/php/Dockerfile
@@ -8,8 +8,8 @@ services:
     restart: always
     volumes:
       - .:/var/www/html
-      - uploads_volume:/var/www/html/public/uploads
-      - media_cache_volume:/var/www/html/public/media/cache
+      - uploads_volume:/var/www/html/public/uploads:rw,delegated
+      - media_cache_volume:/var/www/html/public/media/cache:rw,delegated
 
     depends_on:
       - database

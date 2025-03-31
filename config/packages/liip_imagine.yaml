@@ -1,18 +1,14 @@
 liip_imagine:
     driver: "gd" # You can use "imagick" if you have it installed
-    
     resolvers:
         default:
-            web_path:
-                web_root: '%kernel.project_dir%/public'
-                cache_prefix: 'media/cache'
+            web_path: ~
+
     twig:
         mode: lazy
-
     filter_sets:
         cache: ~
-        
-        # Filters used in templates
+
         thumbnail:
             quality: 85
             filters:
