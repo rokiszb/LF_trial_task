@@ -41,10 +41,10 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
                 $news->addCategory($this->getReference($categoryRef, Category::class));
             }
 
-            $randomStockImage = $stockImages[array_rand($stockImages)];
-            $news->setPictureFilename(basename($randomStockImage));
-
             $manager->persist($news);
+
+            $randomStockImage = $stockImages[array_rand($stockImages)];
+            $this->addStockImage($news, $randomStockImage, $uploadsDir);
             $this->addReference('news_' . $i, $news);
         }
 
@@ -59,7 +59,7 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
         }
 
         $finder = new Finder();
-        $finder->files()->in($stockDir)->name(['*.jpg', '*.jpeg', '*.png', '*.gif']);
+        $finder->files()->in($stockDir)->name(['*.jpg']);
 
         $images = [];
         foreach ($finder as $file) {
@@ -73,9 +73,14 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
     {
         $originalFilename = basename($stockImagePath);
         $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
-        $newFilename = 'news_' . $news->getId() . '_' . uniqid() . '.' . $extension;
+
+        $newFilename = 'image' . ($news->getId() ?: rand(1, 1000)) . '-' . uniqid() . '.' . $extension;
         $newFilePath = $uploadsDir . '/' . $newFilename;
-        copy($stockImagePath, $newFilePath);
+
+        if (!copy($stockImagePath, $newFilePath)) {
+            throw new \RuntimeException("Failed to copy $stockImagePath to $newFilePath");
+        }
+
         chmod($newFilePath, 0666);
         $news->setPictureFilename($newFilename);
     }
