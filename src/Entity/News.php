@@ -140,8 +140,6 @@ class News
         $this->pictureFile = $pictureFile;
 
         if (null !== $pictureFile) {
-            // It is required that at least one field changes if you are using doctrine
-            // otherwise the event listeners won't be called and the file is lost
             $this->updatedAt = new \DateTime();
         }
     }
@@ -202,7 +200,6 @@ class News
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getNews() === $this) {
                 $comment->setNews(null);
             }

@@ -43,7 +43,6 @@ class SendTopNewsCommand extends Command
             );
         }
 
-        // add mailer provider on real project, send it out
         $email = (new Email())
             ->from('noreply@newsportal.com')
             ->to($this->recipient)

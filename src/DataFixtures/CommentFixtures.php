@@ -15,7 +15,6 @@ class CommentFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = Factory::create();
 
-        // Create comments for news articles
         for ($i = 0; $i < 200; $i++) {
             $comment = new Comment();
             $comment->setAuthor($faker->name);
@@ -24,7 +23,7 @@ class CommentFixtures extends Fixture implements DependentFixtureInterface
             $comment->setCreatedAt(new \DateTimeImmutable($faker->dateTimeBetween('-6 months', 'now')->format('Y-m-d H:i:s')));
 
 
-            $randomNewsId = rand(0, 49); // Based on 50 news articles created in NewsFixtures
+            $randomNewsId = rand(0, 49);
             $news = $this->getReference('news_' . $randomNewsId, News::class);
             $comment->setNews($news);
 

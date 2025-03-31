@@ -16,7 +16,6 @@ class NewsViewController extends AbstractController
     #[Route('/news/{id}', name: 'news_view')]
     public function view(News $news, Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Create a new comment form
         $comment = new Comment();
         $comment->setNews($news);
 
