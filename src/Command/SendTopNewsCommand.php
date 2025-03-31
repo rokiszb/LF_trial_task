@@ -17,16 +17,13 @@ use Symfony\Component\Mime\Email;
 )]
 class SendTopNewsCommand extends Command
 {
-    private $newsRepository;
-    private $mailer;
-    private $recipient;
-
-    public function __construct(NewsRepository $newsRepository, MailerInterface $mailer, string $recipient = 'admin@example.com')
+    public function __construct(
+        private NewsRepository $newsRepository,
+        private MailerInterface $mailer,
+        private string $recipient = 'admin@example.com'
+    )
     {
         parent::__construct();
-        $this->newsRepository = $newsRepository;
-        $this->mailer = $mailer;
-        $this->recipient = $recipient;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,13 +44,13 @@ class SendTopNewsCommand extends Command
         }
 
         // add mailer provider on real project, send it out
-//        $email = (new Email())
-//            ->from('noreply@newsportal.com')
-//            ->to($this->recipient)
-//            ->subject('Weekly Top 10 News Report')
-//            ->text($emailContent);
-//
-//        $this->mailer->send($email);
+        $email = (new Email())
+            ->from('noreply@newsportal.com')
+            ->to($this->recipient)
+            ->subject('Weekly Top 10 News Report')
+            ->text($emailContent);
+
+        $this->mailer->send($email);
 
         $io->success('Weekly Top 10 news report has been sent successfully.');
 

@@ -1,5 +1,31 @@
 services:
-  ###> doctrine/doctrine-bundle ###
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: symfony_php
+    restart: always
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - database
+    networks:
+      - symfony_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: symfony_nginx
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - symfony_network
+
   database:
     image: 'mysql:8.4'
     environment:
@@ -8,8 +34,25 @@ services:
       MYSQL_USER: symfony_user
       MYSQL_PASSWORD: pass
     ports:
-      - '3306:3306'
+      #to connect locally change to '3306:3306'
+      - '3306'
     volumes:
       - database_data:/var/lib/mysql
+    networks:
+      - symfony_network
+
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025"
+      - "8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+networks:
+  symfony_network:
+
 volumes:
   database_data:
