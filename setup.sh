@@ -50,23 +50,6 @@ check_php_user() {
     run_command "docker compose exec php bash -c 'echo \"PHP is running as: \$(id)\"'"
 }
 
-# Function to setup uploads directory with proper permissions
-setup_uploads_directories() {
-    echo -e "${BLUE}Setting up uploads directories...${NC}"
-
-    run_command "docker compose exec --user root php bash -c 'mkdir -p /var/www/html/public/uploads/news'"
-    run_command "docker compose exec --user root php bash -c 'mkdir -p /var/www/html/public/media/cache'"
-
-    echo -e "${BLUE}Getting PHP process user info...${NC}"
-    php_user_info=$(docker compose exec php bash -c 'id')
-    echo -e "PHP runs as: $php_user_info"
-
-    run_command "docker compose exec --user root php bash -c 'chown -R www-data:www-data /var/www/html/public/uploads /var/www/html/public/media'"
-    run_command "docker compose exec --user root php bash -c 'chmod -R 2775 /var/www/html/public/uploads /var/www/html/public/media'"
-    run_command "docker compose exec --user root php bash -c 'chmod -R o+w /var/www/html/public/uploads /var/www/html/public/media'"
-    echo -e "${GREEN}✓ Upload directories prepared with correct permissions!${NC}"
-}
-
 case "$1" in
     start)
         echo -e "${GREEN}Starting Docker environment...${NC}"
@@ -91,7 +74,6 @@ case "$1" in
         run_command "docker compose build"
         run_command "docker compose up -d"
         run_command "docker compose exec php composer install"
-        setup_uploads_directories
         wait_for_db
         run_command "docker compose exec php bin/console doctrine:migrations:migrate --no-interaction"
         run_command "docker compose exec php bin/console doctrine:fixtures:load --no-interaction"
@@ -99,10 +81,6 @@ case "$1" in
         echo -e "${GREEN}✓ Setup complete!${NC}"
         echo -e "${GREEN}✓ Access the application at: http://localhost:8080${NC}"
         echo -e "${GREEN}✓ Admin credentials: admin@example.com / pass${NC}"
-        ;;
-    setup-uploads)
-        echo -e "${GREEN}Setting up uploads directories...${NC}"
-        setup_uploads_directories
         ;;
     migrate)
         echo -e "${GREEN}Running database migrations...${NC}"
@@ -165,7 +143,6 @@ case "$1" in
         echo "  restart      - Restart Docker containers"
         echo "  install      - Install Composer dependencies"
         echo "  setup        - Complete setup (start, install, migrate, fixtures, uploads dir)"
-        echo "  setup-uploads - Setup uploads directories with proper permissions"
         echo "  migrate      - Run database migrations"
         echo "  fixtures     - Load database fixtures"
         echo "  db-ready     - Check if database is ready"

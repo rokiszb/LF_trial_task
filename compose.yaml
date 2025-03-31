@@ -1,16 +1,18 @@
 services:
   php:
-    user: "1000:www-data"
+#    user: "1000:www-data"
     build:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: symfony_php
+    command: >
+      bash -c "mkdir -p /var/www/html/public/uploads/news && 
+              chown -R 1000:www-data /var/www/html/public/uploads && 
+              chmod -R 775 /var/www/html/public/uploads && 
+              php-fpm"
     restart: always
     volumes:
       - .:/var/www/html
-      - uploads_volume:/var/www/html/public/uploads:rw,delegated
-      - media_cache_volume:/var/www/html/public/media/cache:rw,delegated
-
     depends_on:
       - database
     networks:
@@ -60,5 +62,3 @@ networks:
 
 volumes:
   database_data:
-  uploads_volume:
-  media_cache_volume:

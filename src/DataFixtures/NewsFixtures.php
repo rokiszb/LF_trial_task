@@ -8,17 +8,12 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Faker\Factory;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 class NewsFixtures extends Fixture implements DependentFixtureInterface
 {
-    private $projectDir;
-
-    public function __construct(string $projectDir)
+    public function __construct(public string $projectDir)
     {
-        $this->projectDir = $projectDir;
     }
 
     public function load(ObjectManager $manager): void
@@ -47,7 +42,8 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $randomStockImage = $stockImages[array_rand($stockImages)];
-            $this->addStockImage($news, $randomStockImage, $uploadsDir);
+            $news->setPictureFilename(basename($randomStockImage));
+
             $manager->persist($news);
             $this->addReference('news_' . $i, $news);
         }
