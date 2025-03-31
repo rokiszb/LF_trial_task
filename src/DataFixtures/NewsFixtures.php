@@ -27,18 +27,11 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = Factory::create();
 
-        // Define the directory where stock images are located
         $stockImagesDir = $this->parameterBag->get('kernel.project_dir') . '/public/media/stock';
-
         $uploadDir = $this->parameterBag->get('kernel.project_dir') . '/public/uploads/news';
-        if (!$this->filesystem->exists($uploadDir)) {
-            $this->filesystem->mkdir($uploadDir, 0755);
-        }
-
         $finder = new Finder();
         $finder->files()->in($stockImagesDir)->name(['*.jpg', '*.jpeg', '*.png']);
 
-        // Convert to array for random access
         $stockImages = iterator_to_array($finder);
         $stockImagesCount = count($stockImages);
 
@@ -75,10 +68,9 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
 
             $news->setInsertDate(new \DateTimeImmutable($faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d H:i:s')));
 
-            // Add 1-3 random categories to each news article
             $categoryCount = rand(1, 3);
             for ($j = 0; $j < $categoryCount; $j++) {
-                $randomCategoryId = rand(0, 9); // Based on 10 categories created in CategoryFixtures
+                $randomCategoryId = rand(0, 9);
                 $category = $this->getReference('category_' . $randomCategoryId, Category::class);
                 $news->addCategory($category);
             }
@@ -91,21 +83,8 @@ class NewsFixtures extends Fixture implements DependentFixtureInterface
             $destinationPath = $uploadDir . '/' . $pictureFileName;
             copy($stockImage->getRealPath(), $destinationPath);
 
-            // Set the pictureFileName for VichUploader
             $news->setPictureFileName($pictureFileName);
-//            $webPath = 'uploads/news/' . $pictureFileName;
-//            try {
-//                // Generate thumbnails for configured filter sets
-//                $this->filterService->getUrlOfFilteredImage($webPath, 'thumbnail');
-//                $this->filterService->getUrlOfFilteredImage($webPath, 'news_medium');
-//            } catch (\Exception $e) {
-//                // Handle or log error
-//            }
-
-
             $manager->persist($news);
-
-            // Store reference for comments
             $this->addReference('news_' . $i, $news);
         }
 

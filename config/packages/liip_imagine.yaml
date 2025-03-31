@@ -6,6 +6,8 @@ liip_imagine:
             web_path:
                 web_root: '%kernel.project_dir%/public'
                 cache_prefix: 'media/cache'
+    twig:
+        mode: lazy
 
     filter_sets:
         cache: ~

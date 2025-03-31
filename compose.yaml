@@ -1,5 +1,6 @@
 services:
   php:
+    user: "${UID:-1000}:${GID:-1000}"
     build:
       context: .
       dockerfile: docker/php/Dockerfile
@@ -7,6 +8,9 @@ services:
     restart: always
     volumes:
       - .:/var/www/html
+      - uploads_volume:/var/www/html/public/uploads
+      - media_cache_volume:/var/www/html/public/media/cache
+
     depends_on:
       - database
     networks:
@@ -35,7 +39,7 @@ services:
       MYSQL_PASSWORD: pass
     ports:
       #to connect locally change to '3306:3306'
-      - '3306'
+      - '3306:3306'
     volumes:
       - database_data:/var/lib/mysql
     networks:
@@ -56,3 +60,5 @@ networks:
 
 volumes:
   database_data:
+  uploads_volume:
+  media_cache_volume:
