@@ -11,7 +11,9 @@
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         <div class="card-header bg-primary text-white">
-                            <h3>{{ category.title }}</h3>
+                            <h3>
+                                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="badge bg-secondary text-decoration-none link-light">{{ category.title }}</a>
+                            </h3>
                         </div>
                         <div class="card-body">
                             {% if latestNewsByCategory[category.id] is defined and latestNewsByCategory[category.id]|length > 0 %}
@@ -20,9 +22,8 @@
                                         <li class="list-group-item">
                                             <h3>{{ news.title }}</h3>
                                         {% if news.pictureFilename %}
-                                            <img src="{{ vich_uploader_asset(news, 'pictureFile') | imagine_filter('large') }}"
+                                            <img src="{{ vich_uploader_asset(news, 'pictureFile') | imagine_filter('medium') }}"
                                                  class="img-fluid rounded" alt="{{ news.title }}">
-                                            a
                                         {% endif %}
                                             <p>{{ news.content|length > 100 ? (news.content|slice(0, 100) ~ '...') | raw  : news.content }}</p>
                                             <small class="text-muted">Published: {{ news.insertDate|date('Y-m-d') }}</small>
