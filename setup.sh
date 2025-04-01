@@ -116,7 +116,7 @@ case "$1" in
     mysql)
         echo -e "${GREEN}Connecting to MySQL...${NC}"
         wait_for_db
-        run_command "docker compose exec -e MYSQL_PWD=symfony database mysql -usymfony symfony"
+        run_command "docker compose exec -e MYSQL_PWD=pass database mysql -u symfony"_user
         ;;
     logs)
         echo -e "${GREEN}Showing logs...${NC}"
