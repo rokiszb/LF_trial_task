@@ -87,6 +87,11 @@ case "$1" in
         wait_for_db
         run_command "docker compose exec php bin/console doctrine:migrations:migrate --no-interaction"
         ;;
+    create-admin)
+        echo -e "${GREEN}Running database migrations...${NC}"
+        wait_for_db
+        run_command "docker compose exec php bin/console doctrine:fixtures:load --group=AdminFixtures --no-interaction"
+        ;;
     fixtures)
         echo -e "${GREEN}Loading fixtures...${NC}"
         wait_for_db
@@ -139,6 +144,7 @@ case "$1" in
         echo "  install      - Install Composer dependencies"
         echo "  setup        - Complete setup (start, install, migrate, fixtures, uploads dir)"
         echo "  migrate      - Run database migrations"
+        echo "  create-admin - Run admin user migration"
         echo "  fixtures     - Load database fixtures"
         echo "  db-ready     - Check if database is ready"
         echo "  cache-images - Process news images with Liip imagine bundle"

@@ -44,6 +44,13 @@ chmod +x setup.sh
 ./setup.sh setup
 ```
 
+And if you want quick launch but without fixtures. These commands will up containers, create database and admin
+```
+./setup.sh start
+./setup.sh migrate
+./setup.sh create-admin
+```
+
 ```
 for first time launch caching images will speed up first page load time
 ./setup.sh cache-images
