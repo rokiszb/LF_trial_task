@@ -28,7 +28,6 @@ wait_for_db() {
     TRIES=0
 
     while [ $TRIES -lt $MAX_TRIES ]; do
-        # Use MYSQL_PWD environment variable to avoid exposing password on command line
         if docker compose exec -e MYSQL_PWD=symfony database mysqladmin ping -h"localhost" -u"symfony" --silent; then
             echo -e "${GREEN}✓ Database is ready!${NC}"
             # Add an extra sleep to ensure MySQL is fully initialized
@@ -41,7 +40,7 @@ wait_for_db() {
         sleep 2
     done
 
-    echo -e "${RED}✗ Database failed to become ready after $max_retries attempts!${NC}"
+    echo -e "${RED}✗ Database failed to become ready after $MAX_TRIES attempts!${NC}"
     return 1
 }
 
