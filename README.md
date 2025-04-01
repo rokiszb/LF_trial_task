@@ -83,7 +83,7 @@ docker compose exec php bin/console doctrine:fixtures:load --no-interaction
 
 The project includes Mailpit for testing emails:
 - SMTP server runs on port 1025 (used internally by the application)
-- To send test email docker compose exec php bin/console app:send-top-news
+- To send test email `docker compose exec php bin/console app:send-top-statistics`
 - Web interface available at http://localhost:8025 you can check sent emails there
 
 ## Development Workflow

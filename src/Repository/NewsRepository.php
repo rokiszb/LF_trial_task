@@ -18,6 +18,18 @@ class NewsRepository extends ServiceEntityRepository
         parent::__construct($registry, News::class);
     }
 
+    public function findTopViewed(int $limit = 10): array
+    {
+        return $this->createQueryBuilder('n')
+            ->select('COUNT(c) as commentCount, n.title, n.insertDate, n.content')
+            ->leftJoin('n.comments', 'c')
+            ->groupBy('n.id')  // Make sure to group by the primary key
+            ->orderBy('commentCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findLatestByCategory(Category $category, int $limit): array
     {
         return $this->createQueryBuilder('n')

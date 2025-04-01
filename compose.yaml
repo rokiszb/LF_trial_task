@@ -46,7 +46,6 @@ services:
     networks:
       - symfony_network
 
-
   mailer:
     image: axllent/mailpit
     ports:
