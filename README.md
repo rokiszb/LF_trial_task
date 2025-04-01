@@ -56,6 +56,11 @@ for first time launch caching images will speed up first page load time
 ./setup.sh cache-images
 ```
 
+If images does not show there might be permission issue setting up project, run
+````
+run_command "docker compose exec php chown -R www-data:www-data /var/www/html/public/media"
+````
+
 This script will:
 - Start the Docker environment 
 - Install dependencies

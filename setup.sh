@@ -77,6 +77,7 @@ case "$1" in
         wait_for_db
         run_command "docker compose exec php bin/console doctrine:migrations:migrate --no-interaction"
         run_command "docker compose exec php bin/console doctrine:fixtures:load --no-interaction"
+        run_command "docker compose exec php chown -R www-data:www-data /var/www/html/public/media"
 
         echo -e "${GREEN}✓ Setup complete!${NC}"
         echo -e "${GREEN}✓ Access the application at: http://localhost:8080${NC}"

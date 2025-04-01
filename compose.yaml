@@ -7,8 +7,9 @@ services:
     restart: always
     volumes:
       - .:/var/www/html
+
     depends_on:
-      - database
+    - database
     networks:
       - symfony_network
 

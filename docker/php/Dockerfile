@@ -36,8 +36,7 @@ RUN composer install --no-interaction --optimize-autoloader
 
 RUN usermod -a -G www-data www-data
 
-RUN mkdir -p /var/www/html/public/uploads/news \
-    && mkdir -p /var/www/html/public/media/cache \
+RUN mkdir -p /var/www/html/public/uploads/ \
     && chown -R www-data:www-data /var/www/html/public/uploads /var/www/html/public/media \
     && chmod -R 775 /var/www/html/public/uploads /var/www/html/public/media
 
