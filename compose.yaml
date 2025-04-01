@@ -4,11 +4,6 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: symfony_php
-    command: >
-      bash -c "mkdir -p /var/www/html/public/uploads/news && 
-              chown -R 1000:www-data /var/www/html/public/uploads && 
-              chmod -R 775 /var/www/html/public/uploads && 
-              php-fpm"
     restart: always
     volumes:
       - .:/var/www/html
@@ -31,6 +26,20 @@ services:
     networks:
       - symfony_network
 
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: symfony_scheduler
+    command: ["php", "/var/www/html/bin/console", "messenger:consume",
+              "scheduler_default", "--time-limit=3600", "-vv"]
+    restart: always
+    depends_on:
+      - php
+      - database
+    networks:
+      - symfony_network
+
   database:
     image: 'mysql:8.4'
     environment:
@@ -39,7 +48,7 @@ services:
       MYSQL_USER: symfony_user
       MYSQL_PASSWORD: pass
     ports:
-      #to connect locally change to '3306:3306'
+      #to connect locally change to '3306:3306, on prod should external port shouldn't be exposed
       - '3306:3306'
     volumes:
       - database_data:/var/lib/mysql

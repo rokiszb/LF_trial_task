@@ -1,8 +1,25 @@
-# Symfony Docker Project
+# News Portal Application
 
-This is a Symfony 7.2 application configured with Docker for easy development.
+A Symfony-based news portal application with features like news management, categorization, and automated weekly statistics emails.
 
-## Getting Started
+## Features
+
+- News management with categories and tags
+- User authentication and role-based permissions
+- Image upload and processing
+- Responsive frontend design
+- Weekly top news statistics emails
+- Docker containerization for easy deployment
+
+## Tech Stack
+
+- PHP 8.2
+- Symfony 7.2
+- MySQL 8.4
+- Docker & Docker Compose
+- Twig templating (Bootstrap for styling)
+- Doctrine ORM
+- Symfony Scheduler for automated tasks
 
 ### Prerequisites
 
@@ -14,7 +31,7 @@ This is a Symfony 7.2 application configured with Docker for easy development.
 1. Clone this repository:
 ```
 git clone git@github.com:rokiszb/LF_trial_task.git
-   cd LF_trial_task
+cd LF_trial_task
 ```
 
 2. Run the setup script to initialize everything automatically, make sure you can execute file, run:
@@ -25,6 +42,11 @@ And if you dont' have permissions:
 ```
 chmod +x setup.sh
 ./setup.sh setup
+```
+
+```
+for first time launch caching images will speed up first page load time
+./setup.sh cache-images
 ```
 
 This script will:
