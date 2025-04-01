@@ -7,7 +7,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 
-#[AsPeriodicTask(frequency: '1 second', method: 'sendStatistics',)]
+#[AsPeriodicTask(frequency: '1 week', method: 'sendStatistics',)]
 class SendWeeklyTopStatistics
 {
     public function __construct(
