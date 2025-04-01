@@ -101,6 +101,22 @@ case "$1" in
         echo -e "${GREEN}Checking if database is ready...${NC}"
         wait_for_db
         ;;
+    mysql)
+        echo -e "${GREEN}Connecting to MySQL...${NC}"
+        wait_for_db
+        if [ -f ".env" ]; then
+            source .env
+            if [ -z "$MYSQL_PASSWORD" ]; then
+                echo -e "${YELLOW}No password found in .env file. You will be prompted for password.${NC}"
+                run_command "docker compose exec database mysql -u ${MYSQL_USER:-symfony_user} -p"
+            else
+                run_command "docker compose exec -e MYSQL_PWD=\"$MYSQL_PASSWORD\" database mysql -u ${MYSQL_USER:-symfony_user}"
+            fi
+        else
+            echo -e "${YELLOW}No .env file found. You will be prompted for password.${NC}"
+            run_command "docker compose exec database mysql -u symfony_user -p"
+        fi
+        ;;
     cache-images)
         echo -e "${GREEN}Resolving Liip cache for news images...${NC}"
         run_command "docker compose exec php bash -c \"for img in \\\$(find public/uploads/news -type f -name \\\"*.jpg\\\"); do web_path=\\\${img#public/}; bin/console liip:imagine:cache:resolve \\\"\\\$web_path\\\" --filter=large; done\""
@@ -112,11 +128,6 @@ case "$1" in
     bash)
         echo -e "${GREEN}Opening bash shell in PHP container...${NC}"
         run_command "docker compose exec php bash"
-        ;;
-    mysql)
-        echo -e "${GREEN}Connecting to MySQL...${NC}"
-        wait_for_db
-        run_command "docker compose exec -e MYSQL_PWD=pass database mysql -u symfony"_user
         ;;
     logs)
         echo -e "${GREEN}Showing logs...${NC}"
