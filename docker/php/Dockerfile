@@ -20,9 +20,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath zip intl xml gd
 
-
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath zip intl xml
-
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN echo "upload_max_filesize = 20M" > /usr/local/etc/php/conf.d/uploads.ini && \
