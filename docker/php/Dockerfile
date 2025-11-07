@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libwebp-dev \
-    libxpm-dev
+    libxpm-dev \
+    libicu-dev
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
